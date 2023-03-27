@@ -10,36 +10,27 @@ class RandomChar extends Component {
 		this.updateChar();
 	}
 	state = {
-		name: null,
-		description: null,
-		thumbnail: null,
-		homePage: null,
-		wiki: null
-
+		persona: {}
 	}
 
 	marvelService = new MarvelService();
 
+	onCharLoaded = (objRes) => {
+		this.setState({persona: objRes})
+	}
+
 	updateChar = () =>{
-		const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
+		const id = 1017100//Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
 		this.marvelService
 			.getCharacter(id)
-			.then(res => {
-				this.setState({
-					name: res.data.results[0].name,
-					description: res.data.results[0].description,
-					thumbnail: res.data.results[0].thumbnail.path+'.'+res.data.results[0].thumbnail.extension,
-					homePage: res.data.results[0].urls[0].url,
-					wiki: res.data.results[0].urls[1].url,
-				})
-			})
+			.then(this.onCharLoaded)
+			// .then((r) => console.log(r))
 	}
+
+
     render() {
-		const {name, description, thumbnail, homePage, wiki} = this.state;
-		let desc = '';
-      if (description !== null && description.length > 300) {
-			desc = description.slice(0,217)
-		};
+		const {persona: {name, description, thumbnail, homePage, wiki}} = this.state;
+
 
 		return (
 
@@ -49,7 +40,7 @@ class RandomChar extends Component {
 					  <div className="randomchar__info">
 							<p className="randomchar__name">{name}</p>
 							<p className="randomchar__descr">
-								 {desc}
+								 {description}
 							</p>
 							<div className="randomchar__btns">
 								 <a href={homePage} className="button button__main">
