@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import './charList.scss';
 
 import MarvelService from '../services/MarvelService';
@@ -17,11 +18,11 @@ class CharList extends Component {
 
 	marvelService = new MarvelService();
 
-	componentDidMount(){
+	componentDidMount() {
 		this.onRequest();
 	}
 
-	onRequest(offset){
+	onRequest(offset) {
 		this.onCharsLoadding();
 		this.marvelService
 			.getAllCharacters(offset)
@@ -36,15 +37,15 @@ class CharList extends Component {
 	}
 	onCharsLoaded = (newCharList) => {
 		let ended = false;
-		if(newCharList.length < 9){
+		if (newCharList.length < 9) {
 			ended = true;
 		}
-		this.setState(({charItem, offset}) => ({
-				charItem: [...charItem, ...newCharList],
-				loading: false,
-				newItemsLoading: false,
-				offset: offset + 9,
-				charEnded: ended
+		this.setState(({ charItem, offset }) => ({
+			charItem: [...charItem, ...newCharList],
+			loading: false,
+			newItemsLoading: false,
+			offset: offset + 9,
+			charEnded: ended
 		}))
 	}
 
@@ -56,60 +57,64 @@ class CharList extends Component {
 	}
 
 	renderItems = (arr) => {
-		const {propsOnCharSelected} = this.props;
+		const { propsOnCharSelected } = this.props;
 		const noImg = 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg';
 
-		const charItems = arr.map((item  ) => {
+		const charItems = arr.map((item) => {
 			const className = 'char__item';
-			const ImgStyle = (item.thumbnail === noImg) ?  {'objectFit': 'unset'} : {'objectFit': 'cover'};
+			const ImgStyle = (item.thumbnail === noImg) ? { 'objectFit': 'unset' } : { 'objectFit': 'cover' };
 
-				return (
-					<li
-						className={className}
-						key={item.id}
-						onClick={() => propsOnCharSelected(item.id)}
-						>
+			return (
+				<li
+					className={className}
+					key={item.id}
+					onClick={() => propsOnCharSelected(item.id)}
+				>
 
-							<img style = {ImgStyle} src={item.thumbnail} alt={item.name}/>
-							<div className="char__name">{item.name}</div>
-					</li>
-				)
+					<img style={ImgStyle} src={item.thumbnail} alt={item.name} />
+					<div className="char__name">{item.name}</div>
+				</li>
+			)
 		})
 
 		return (
 			<ul className="char__grid">
 				{charItems}
-	  		</ul>
+			</ul>
 
-	  )
+		)
 
 	}
 
-	render(){
-		const {charItem, loading, error, newItemsLoading, offset, charEnded} = this.state;
+	render() {
+		const { charItem, loading, error, newItemsLoading, offset, charEnded } = this.state;
 
 		const items = this.renderItems(charItem);
 
-		const errorMessage = error ? <ErrorMessage/> : null;
-		const spinner = loading ? <Spinner/> : null;
+		const errorMessage = error ? <ErrorMessage /> : null;
+		const spinner = loading ? <Spinner /> : null;
 		const content = !(loading || error) ? items : null;
 
 		return (
-			 <div className="char__list">
-				  {errorMessage}
-				  {spinner}
-				  {content}
-				  <button
-				  	className="button button__main button__long"
+			<div className="char__list">
+				{errorMessage}
+				{spinner}
+				{content}
+				<button
+					className="button button__main button__long"
 					disabled={newItemsLoading}
-					style={{'display' :  charEnded ? 'none' : 'block'}}
+					style={{ 'display': charEnded ? 'none' : 'block' }}
 					onClick={() => this.onRequest(offset)}>
-						<div className="inner">load more</div>
-				  </button>
-			 </div>
+					<div className="inner">load more</div>
+				</button>
+			</div>
 		)
-  }
+	}
 
+}
+
+CharList.propTypes = {
+	propsOnCharSelected: PropTypes.func.isRequired
 }
 
 export default CharList;
