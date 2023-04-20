@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './charList.scss';
 
@@ -7,6 +7,7 @@ import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 
 class CharList extends Component {
+
 	state = {
 		charItem: [],
 		loading: true,
@@ -14,6 +15,18 @@ class CharList extends Component {
 		newItemsLoading: false,
 		offset: 210,
 		charEnded: false
+	}
+
+	myItemsRef = [];
+	setRef = (ref) => {
+		this.myItemsRef.push(ref);
+	}
+
+	focusOnChar = (id) => {
+		// console.dir(this.myItemsRef[id]);
+		this.myItemsRef.forEach(item => { item.classList.remove('char__item_selected') });
+		this.myItemsRef[id].classList.add('char__item_selected');
+		this.myItemsRef[id].focus();
 	}
 
 	marvelService = new MarvelService();
@@ -60,15 +73,27 @@ class CharList extends Component {
 		const { propsOnCharSelected } = this.props;
 		const noImg = 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg';
 
-		const charItems = arr.map((item) => {
+		const charItems = arr.map((item, i) => {
 			const className = 'char__item';
 			const ImgStyle = (item.thumbnail === noImg) ? { 'objectFit': 'unset' } : { 'objectFit': 'cover' };
 
 			return (
 				<li
+					ref={this.setRef}
+					tabIndex={0}
 					className={className}
 					key={item.id}
-					onClick={() => propsOnCharSelected(item.id)}
+					onClick={() => {
+						propsOnCharSelected(item.id);
+						this.focusOnChar(i)
+					}
+					}
+					onKeyDown={(e) => {
+						if (e.key === ' ' || e.key === "Enter") {
+							this.props.propsOnCharSelected(item.id);
+							this.focusOnChar(i);
+						}
+					}}
 				>
 
 					<img style={ImgStyle} src={item.thumbnail} alt={item.name} />
